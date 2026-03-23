@@ -24,17 +24,22 @@ export default function HomePage({ events, announcements, sermons, lessons, load
   }, [])
 
   const campNotice = useMemo(() => {
-    const camps = events.filter(e => e.type === 'camp')
-    for (const c of camps) {
-      const start = new Date(c.start_date+'T00:00:00'), end = new Date(c.end_date+'T23:59:59')
-      if (now >= start && now <= end) {
-        const pct = Math.min(((now-start)/(end-start))*100,100)
-        let status = 'Happening Now'
-        if (pct >= 85) status = 'Almost Done'
-        return { ...c, status, pct, isLive:true }
-      }
+    // First check for any live event (prioritize camps, then others)
+    const liveEvents = events.filter(e => {
+      const start = new Date(e.start_date+'T00:00:00'), end = new Date(e.end_date+'T23:59:59')
+      return now >= start && now <= end
+    })
+    // Prefer live camps, then any live event
+    const liveEvent = liveEvents.find(e => e.type === 'camp') || liveEvents[0]
+    if (liveEvent) {
+      const start = new Date(liveEvent.start_date+'T00:00:00'), end = new Date(liveEvent.end_date+'T23:59:59')
+      const pct = Math.min(((now-start)/(end-start))*100,100)
+      let status = 'Happening Now'
+      if (pct >= 85) status = 'Almost Done'
+      return { ...liveEvent, status, pct, isLive:true }
     }
-    const upcoming = camps.filter(c => new Date(c.start_date+'T00:00:00') > now)
+    // Otherwise show the very next upcoming event
+    const upcoming = events.filter(e => new Date(e.start_date+'T00:00:00') > now)
     if (upcoming.length) return { ...upcoming[0], status:'Upcoming', pct:0, isLive:false }
     return null
   }, [events, now])

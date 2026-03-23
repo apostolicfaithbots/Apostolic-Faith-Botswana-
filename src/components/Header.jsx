@@ -31,8 +31,8 @@ export default function Header() {
     <header style={{
       position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1000,
       padding: scrolled ? '0.6rem 0' : '1rem 0',
-      background: scrolled ? 'rgba(26,26,26,0.96)' : (isHome ? 'transparent' : 'rgba(26,26,26,0.96)'),
-      backdropFilter: scrolled ? 'blur(20px)' : 'none',
+      background: (scrolled || menuOpen) ? 'rgba(26,26,26,0.96)' : (isHome ? 'transparent' : 'rgba(26,26,26,0.96)'),
+      backdropFilter: (scrolled || menuOpen) ? 'blur(20px)' : 'none',
       transition: 'all 0.5s cubic-bezier(0.16,1,0.3,1)',
       borderBottom: scrolled ? '1px solid rgba(255,255,255,0.08)' : '1px solid transparent',
     }}>
